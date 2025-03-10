@@ -19,5 +19,8 @@ class DragDropWidget(QWidget):
 
     def dropEvent(self, event):
         files = [url.toLocalFile() for url in event.mimeData().urls()]
-        self.label.setText(f"Выбрано: {files[0]}")
-        self.parent().selected_folder = files[0]
+        if files:
+            self.parent().selected_folder = files[0]
+            self.label.setText(f"Выбрано: {files[0]}")
+            self.parent().backup_button.setEnabled(True)  # 🔥 Теперь кнопка активируется!
+

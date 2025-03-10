@@ -1,0 +1,15 @@
+{
+    "backup_folder": "backups/",
+    "auto_backup": false,
+    "backup_interval": 24,
+    "server": {
+        "ip": "",
+        "username": "",
+        "password": "",
+        "port": 21,
+        "type": "FTP"
+    },
+    "encryption": {
+        "enabled": false
+    }
+}
