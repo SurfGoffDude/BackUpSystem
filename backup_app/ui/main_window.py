@@ -52,16 +52,17 @@ class MainWindow(QMainWindow):
 
     def restore_backup(self):
         if self.selected_folder:
-            file_name = os.path.basename(self.selected_folder)  # Берём только имя файла
-            restore_path = os.path.expanduser("~/Desktop")  # Восстанавливаем на рабочий стол
+            file_name = os.path.basename(self.selected_folder)  
+            restore_path = os.path.expanduser("~/Desktop")  
             restored_file = restore_backup(file_name, restore_path)
 
             if restored_file:
                 self.log.append(f"✅ Файл восстановлен: {restored_file}")
             else:
-                self.log.append("❌ Ошибка восстановления")
+                self.log.append(f"❌ Ошибка восстановления! Проверьте содержимое backups/!")
         else:
             self.log.append("❌ Ошибка: выберите файл для восстановления")
+
 
 
     def open_settings(self):

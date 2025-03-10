@@ -6,21 +6,29 @@ from ui.notifications import send_notification
 BACKUP_DIR = "backups/"
 
 def find_latest_backup(file_name):
-    """Ищет последнюю версию файла в бэкапах."""
-    backup_folders = sorted(os.listdir(BACKUP_DIR), reverse=True)  # Берём самые новые папки
+    """Ищет последнюю версию файла в папке backups/."""
+    if not os.path.exists(BACKUP_DIR):
+        log_error(f"Папка {BACKUP_DIR} не существует!")
+        return None
+
+    backup_folders = sorted(os.listdir(BACKUP_DIR), reverse=True)  # Сортируем по времени
+    log_info(f"🔍 Проверяем бэкапы: {backup_folders}")
+
     for folder in backup_folders:
         backup_path = os.path.join(BACKUP_DIR, folder, file_name)
         if os.path.isfile(backup_path):
+            log_info(f"✅ Файл найден в {backup_path}")
             return backup_path
-    return None  # Если файла нет в бэкапах
+
+    log_error(f"❌ Файл {file_name} не найден в папке backups/!")
+    return None  # Если файл не найден
 
 def restore_backup(file_name, restore_path):
     """Восстанавливает файл из последнего бэкапа."""
     backup_file = find_latest_backup(file_name)
 
     if not backup_file:
-        log_error(f"Файл {file_name} не найден в бэкапах.")
-        send_notification("Ошибка восстановления", f"Файл {file_name} отсутствует в резервных копиях.")
+        send_notification("Ошибка восстановления", f"Файл {file_name} отсутствует в бэкапах!")
         return False
 
     if not os.path.exists(restore_path):
