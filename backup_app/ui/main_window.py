@@ -1,10 +1,12 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QWidget
 from backup_app.ui.settings_window import SettingsWindow
 from backup_app.ui.widgets import DragDropWidget
-from backup_app.backup.restore import restore_backup
+from backup_app.backup.restore import restore_backup, find_latest_backup
 from backup_app.backup.local_backup import create_backup
+from backup_app.logs.logger import log_info, log_error
 import sys
 import os
+from datetime import datetime
 
 
 class MainWindow(QMainWindow):
@@ -57,13 +59,27 @@ class MainWindow(QMainWindow):
     def restore_backup(self):
         if self.selected_folder:
             file_name = os.path.basename(self.selected_folder)
-            restore_path = os.path.expanduser("~/Downloads/Restore")
-            restored_file = restore_backup(file_name, restore_path)
+            backup_file = find_latest_backup(file_name)  # 🔍 Находим последнюю версию файла
+
+            if not backup_file:
+                self.log.append(f"❌ Ошибка восстановления! Файл {file_name} не найден в backups/")
+                return
+
+            # 📅 Получаем дату последнего изменения файла
+            modified_time = os.path.getmtime(backup_file)
+            formatted_date = datetime.fromtimestamp(modified_time).strftime("%Y-%m-%d_%H-%M-%S")
+
+            restore_path = os.path.expanduser(f"~/Downloads/Restore/{formatted_date}")  # 🔥 Дата в имени папки
+            os.makedirs(restore_path, exist_ok=True)  # Создаём папку, если её нет
+
+            restored_file = restore_backup(file_name, restore_path)  # 🔄 Восстанавливаем
 
             if restored_file:
-                self.log.append(f"✅ Файл восстановлен: {restored_file}")
+                self.log.append(f"✅ Файл восстановлен в {restore_path}")
+                log_info(f"✅ Файл {file_name} восстановлен в {restore_path}")
             else:
                 self.log.append(f"❌ Ошибка восстановления! Проверьте содержимое backups/!")
+                log_error(f"❌ Ошибка восстановления файла {file_name}")
         else:
             self.log.append("❌ Ошибка: выберите файл для восстановления")
 
