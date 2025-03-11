@@ -6,7 +6,6 @@ from backup_app.logs.logger import log_info, log_error
 from backup_app.ui.settings_window import SettingsWindow
 import os
 import sys
-from datetime import datetime
 
 
 class MainWindow(QMainWindow):
