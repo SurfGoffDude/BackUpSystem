@@ -42,12 +42,14 @@ def find_all_backups(file_name):
         log_error(f"❌ Папка {file_backup_path} не найдена!")
         return []
 
-    # 🔥 Теперь собираем ВСЕ версии файла
-    backup_versions = [
-        os.path.join(file_backup_path, folder, file_name)
-        for folder in sorted(os.listdir(file_backup_path), reverse=True)
-        if os.path.isdir(os.path.join(file_backup_path, folder))
-    ]
+    # 🔥 Теперь собираем ВСЕ версии файла, включая все подпапки
+    backup_versions = []
+    for folder in sorted(os.listdir(file_backup_path), reverse=True):
+        folder_path = os.path.join(file_backup_path, folder)
+        if os.path.isdir(folder_path):  # Проверяем, что это папка с датой
+            backup_file = os.path.join(folder_path, file_name)
+            if os.path.isfile(backup_file):
+                backup_versions.append(backup_file)
 
     if not backup_versions:
         log_error(f"❌ В папке {file_backup_path} нет бэкапов!")
@@ -66,18 +68,17 @@ def restore_backup(file_name, restore_base_path):
     modified_time = os.path.getmtime(backup_file)
     formatted_date = datetime.fromtimestamp(modified_time).strftime("%Y-%m-%d_%H-%M-%S")
 
-    # ✅ Проверяем, нет ли уже `file_name` в `restore_base_path`
-    if os.path.basename(restore_base_path) == file_name:
-        final_restore_path = os.path.join(restore_base_path, formatted_date)
-    else:
-        final_restore_path = os.path.join(restore_base_path, formatted_date)
+    # ✅ Убедимся, что restore_base_path НЕ содержит дату
+    if os.path.basename(restore_base_path).startswith("2025"):
+        restore_base_path = os.path.dirname(restore_base_path)  # Убираем ошибочную вложенность
 
-        # ✅ Проверяем, не является ли `final_restore_path` файлом
+    final_restore_path = os.path.join(restore_base_path, file_name, formatted_date)
+
     if os.path.exists(final_restore_path) and not os.path.isdir(final_restore_path):
         log_error(f"❌ Ошибка: {final_restore_path} уже существует и это не папка!")
         return False
 
-    os.makedirs(final_restore_path, exist_ok=True)  # ✅ Создаём папку, если её нет
+    os.makedirs(final_restore_path, exist_ok=True)
 
     restored_file_path = os.path.join(final_restore_path, file_name)
     shutil.copy2(backup_file, restored_file_path)
@@ -113,7 +114,7 @@ def restore_all_files(restore_base_path):
             modified_time = os.path.getmtime(backup_file)
             formatted_date = datetime.fromtimestamp(modified_time).strftime("%Y-%m-%d_%H-%M-%S")
 
-            # 🔥 Убираем лишние уровни вложенности
+            # 🔥 Теперь создаём правильный путь без дублирования
             restore_path = os.path.join(restore_base_path, file_name, formatted_date)
 
             if os.path.exists(restore_path) and not os.path.isdir(restore_path):
@@ -122,9 +123,8 @@ def restore_all_files(restore_base_path):
 
             os.makedirs(restore_path, exist_ok=True)
 
-            restored_file = restore_backup(file_name, restore_path)
-            if restored_file:
-                restored_files.append(restored_file)
+            shutil.copy2(backup_file, os.path.join(restore_path, file_name))
+            restored_files.append(os.path.join(restore_path, file_name))
 
     if restored_files:
         log_info(f"✅ Восстановлены ВСЕ файлы: {restored_files}")
