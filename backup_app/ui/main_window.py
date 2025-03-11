@@ -7,6 +7,8 @@ from backup_app.ui.settings_window import SettingsWindow
 import os
 import sys
 
+BACKUP_DIR = os.path.expanduser("~/Downloads/backups/")
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -74,9 +76,9 @@ class MainWindow(QMainWindow):
             self.log.append("❌ Ошибка: выберите файл или папку для бэкапа")
 
     def restore_backup(self):
-        """Позволяет выбрать файл и папку для восстановления с обновлённой структурой."""
+        """Позволяет выбрать файл и папку для восстановления."""
         file_dialog = QFileDialog(self)
-        file_dialog.setDirectory(os.path.abspath("backups/"))
+        file_dialog.setDirectory(os.path.expanduser("~/Downloads/backups/"))  # 🔥 Новый путь
         file_path, _ = file_dialog.getOpenFileName(self, "Выбрать файл для восстановления")
 
         if not file_path:
@@ -87,7 +89,7 @@ class MainWindow(QMainWindow):
         backup_file = find_latest_backup(file_name)
 
         if not backup_file:
-            self.log.append(f"❌ Ошибка восстановления! Файл {file_name} не найден в backups/")
+            self.log.append(f"❌ Ошибка восстановления! Файл {file_name} не найден в ~/Downloads/backups/")
             return
 
         restore_path = QFileDialog.getExistingDirectory(self, "Выберите папку для восстановления")
@@ -102,7 +104,8 @@ class MainWindow(QMainWindow):
             self.log.append(f"✅ Файл восстановлен в {restore_path}")
             log_info(f"✅ Файл {file_name} восстановлен в {restore_path}")
         else:
-            self.log.append(f"❌ Ошибка восстановления! Проверьте содержимое backups/!")
+            self.log.append(
+                f"❌ Ошибка восстановления! Проверьте содержимое ~/Downloads/backups/: {os.listdir(BACKUP_DIR)}")
             log_error(f"❌ Ошибка восстановления файла {file_name}")
 
     def restore_all_files(self):

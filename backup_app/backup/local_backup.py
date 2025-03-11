@@ -3,7 +3,9 @@ import shutil
 from datetime import datetime
 from backup_app.logs.logger import log_info, log_error
 
-BACKUP_DIR = "backups/"
+BACKUP_DIR = os.path.expanduser("~/Downloads/backups/")
+
+os.makedirs(BACKUP_DIR, exist_ok=True)
 
 
 def create_backup(source_path):
