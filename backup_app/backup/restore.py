@@ -7,24 +7,26 @@ BACKUP_DIR = "backups/"
 
 
 def find_latest_backup(file_name):
-    """Ищет последнюю версию файла в backups/."""
-    if not os.path.exists(BACKUP_DIR):
-        log_error(f"❌ Папка {BACKUP_DIR} не существует!")
+    """Ищет последнюю версию файла в новой структуре backups/{имя файла}/{дата}/файл."""
+    file_backup_path = os.path.join(BACKUP_DIR, file_name)
+
+    if not os.path.exists(file_backup_path):
+        log_error(f"❌ Папка {file_backup_path} не найдена!")
         return None
 
-    backup_folders = sorted(os.listdir(BACKUP_DIR), reverse=True)  # Сортируем от новых к старым
+    backup_folders = sorted(os.listdir(file_backup_path), reverse=True)  # Сортируем по дате
     for folder in backup_folders:
-        backup_path = os.path.join(BACKUP_DIR, folder, file_name)
-        if os.path.isfile(backup_path):
-            log_info(f"✅ Файл найден в {backup_path}")
-            return backup_path
+        backup_file = os.path.join(file_backup_path, folder, file_name)
+        if os.path.isfile(backup_file):
+            log_info(f"✅ Найден бэкап: {backup_file}")
+            return backup_file
 
-    log_error(f"❌ Файл {file_name} не найден в backups/")
+    log_error(f"❌ Файл {file_name} не найден в backups/{file_name}/")
     return None  # Если файл не найден
 
 
 def restore_backup(file_name, restore_base_path):
-    """Восстанавливает файл из последнего бэкапа в ~/Downloads/Restore/{имя файла}/{дата}/."""
+    """Восстанавливает файл из последнего бэкапа в ~/Downloads/Restore/{имя файла}/{дата}/файл."""
     backup_file = find_latest_backup(file_name)
 
     if not backup_file:
@@ -35,14 +37,18 @@ def restore_backup(file_name, restore_base_path):
     modified_time = os.path.getmtime(backup_file)
     formatted_date = datetime.fromtimestamp(modified_time).strftime("%Y-%m-%d_%H-%M-%S")
 
-    # 🗂️ Новый путь восстановления
-    restore_path = os.path.join(restore_base_path, file_name, formatted_date)
-    os.makedirs(restore_path, exist_ok=True)
+    # 🗂️ Новый путь восстановления (исключаем лишние уровни вложенности)
+    final_restore_path = os.path.join(restore_base_path, file_name, formatted_date)
 
-    restored_file_path = os.path.join(restore_path, file_name)
+    if os.path.basename(final_restore_path) == file_name:
+        final_restore_path = os.path.join(restore_base_path, formatted_date)  # Убираем дублирование
+
+    os.makedirs(final_restore_path, exist_ok=True)
+
+    restored_file_path = os.path.join(final_restore_path, file_name)
     shutil.copy2(backup_file, restored_file_path)
 
-    log_info(f"✅ Файл {file_name} восстановлен в {restore_path}")
+    log_info(f"✅ Файл {file_name} восстановлен в {final_restore_path}")
     return restored_file_path
 
 

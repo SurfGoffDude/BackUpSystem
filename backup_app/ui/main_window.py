@@ -34,7 +34,6 @@ class MainWindow(QMainWindow):
         self.backup_button.clicked.connect(self.create_backup)
 
         self.restore_button = QPushButton("🔄 Восстановить")
-        self.restore_button.setEnabled(False)
         self.restore_button.clicked.connect(self.restore_backup)
 
         self.settings_button = QPushButton("⚙️ Настройки")
@@ -76,18 +75,36 @@ class MainWindow(QMainWindow):
             self.log.append("❌ Ошибка: выберите файл или папку для бэкапа")
 
     def restore_backup(self):
-        """Восстанавливает выбранный файл в ~/Downloads/Restore/{имя файла}/{дата}/"""
-        if self.selected_folder:
-            file_name = os.path.basename(self.selected_folder)
-            restore_base_path = os.path.expanduser("~/Downloads/Restore")  # 🔥 Новая структура папок
-            restored_file = restore_backup(file_name, restore_base_path)
+        """Позволяет выбрать файл и папку для восстановления с обновлённой структурой."""
+        file_dialog = QFileDialog(self)
+        file_dialog.setDirectory(os.path.abspath("backups/"))
+        file_path, _ = file_dialog.getOpenFileName(self, "Выбрать файл для восстановления")
 
-            if restored_file:
-                self.log.append(f"✅ Файл восстановлен в {restore_base_path}/{file_name}/")
-            else:
-                self.log.append(f"❌ Ошибка восстановления! Проверьте содержимое backups/!")
+        if not file_path:
+            self.log.append("⚠ Выбор отменён, файл не был выбран.")
+            return
+
+        file_name = os.path.basename(file_path)
+        backup_file = find_latest_backup(file_name)
+
+        if not backup_file:
+            self.log.append(f"❌ Ошибка восстановления! Файл {file_name} не найден в backups/")
+            return
+
+        restore_path = QFileDialog.getExistingDirectory(self, "Выберите папку для восстановления")
+
+        if not restore_path:
+            self.log.append("⚠ Выбор отменён, папка не была выбрана.")
+            return
+
+        restored_file = restore_backup(file_name, restore_path)
+
+        if restored_file:
+            self.log.append(f"✅ Файл восстановлен в {restore_path}")
+            log_info(f"✅ Файл {file_name} восстановлен в {restore_path}")
         else:
-            self.log.append("❌ Ошибка: выберите файл для восстановления")
+            self.log.append(f"❌ Ошибка восстановления! Проверьте содержимое backups/!")
+            log_error(f"❌ Ошибка восстановления файла {file_name}")
 
     def restore_all_files(self):
         """Восстанавливает все файлы из backups/"""
