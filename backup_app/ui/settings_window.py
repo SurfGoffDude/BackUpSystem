@@ -1,8 +1,10 @@
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QCheckBox, QLineEdit, QFileDialog
 from ui.server_settings_window import ServerSettingsWindow
 
+
 class SettingsWindow(QDialog):
     """Окно настроек приложения"""
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Настройки")

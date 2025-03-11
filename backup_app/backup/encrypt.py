@@ -2,6 +2,7 @@ from cryptography.fernet import Fernet
 
 KEY_FILE = "backup.key"
 
+
 def generate_key():
     """Генерирует и сохраняет ключ для шифрования."""
     key = Fernet.generate_key()
@@ -9,10 +10,12 @@ def generate_key():
         file.write(key)
     print("Ключ сохранён в", KEY_FILE)
 
+
 def load_key():
     """Загружает ключ из файла."""
     with open(KEY_FILE, "rb") as file:
         return file.read()
+
 
 def encrypt_file(filename):
     """Шифрует файл."""
@@ -24,8 +27,9 @@ def encrypt_file(filename):
 
     with open(filename + ".enc", "wb") as file:
         file.write(encrypted_data)
-    
+
     print(f"Файл {filename} зашифрован.")
+
 
 def decrypt_file(encrypted_filename):
     """Расшифровывает файл."""
@@ -41,6 +45,7 @@ def decrypt_file(encrypted_filename):
         file.write(decrypted_data)
 
     print(f"Файл {encrypted_filename} расшифрован в {original_filename}")
+
 
 if __name__ == "__main__":
     action = input("Выберите действие (generate/encrypt/decrypt): ").strip().lower()

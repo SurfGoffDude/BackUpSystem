@@ -1,5 +1,6 @@
 import paramiko
 
+
 def configure_ftp_server(server_ip, username, password):
     """Настраивает FTP-сервер на удалённом сервере"""
     try:

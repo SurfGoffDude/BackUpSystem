@@ -7,8 +7,10 @@ from backup.restore import restore_file
 
 BACKUP_DIR = "backups/"
 
+
 class TimelineWindow(QDialog):
     """Окно с таймлайном истории файлов."""
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("История файлов")

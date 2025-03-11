@@ -16,17 +16,21 @@ logging.basicConfig(
     ]
 )
 
+
 def log_info(message):
     """Записывает информационное сообщение в лог"""
     logging.info(message)
+
 
 def log_warning(message):
     """Записывает предупреждение в лог"""
     logging.warning(message)
 
+
 def log_error(message):
     """Записывает ошибку в лог"""
     logging.error(message)
+
 
 if __name__ == "__main__":
     log_info("Приложение запущено.")

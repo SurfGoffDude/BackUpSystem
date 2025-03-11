@@ -4,8 +4,10 @@ from services.server_setup import configure_ftp_server
 import paramiko
 import ftplib
 
+
 class ServerSettingsWindow(QDialog):
     """Окно настроек удалённого сервера"""
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Настройки удалённого сервера")

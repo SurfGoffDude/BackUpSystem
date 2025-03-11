@@ -1,8 +1,11 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QWidget
-from ui.widgets import DragDropWidget
-from backup.restore import restore_backup
+from backup_app.ui.settings_window import SettingsWindow
+from backup_app.ui.widgets import DragDropWidget
+from backup_app.backup.restore import restore_backup
+from backup_app.backup.local_backup import create_backup
 import sys
 import os
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -42,18 +45,19 @@ class MainWindow(QMainWindow):
 
     def create_backup(self):
         if self.selected_folder:
-            backup_path = os.path.join("backups", os.path.basename(self.selected_folder))
-            os.makedirs(backup_path, exist_ok=True)
+            backup_path = create_backup(self.selected_folder)
 
-            self.log.append(f"✅ Бэкап создан: {self.selected_folder}")
-            self.restore_button.setEnabled(True)  # 🔥 Теперь можно восстанавливать
+            if backup_path:
+                self.log.append(f"✅ Бэкап создан: {backup_path}")
+            else:
+                self.log.append("❌ Ошибка при создании бэкапа")
         else:
             self.log.append("❌ Ошибка: выберите файл или папку для бэкапа")
 
     def restore_backup(self):
         if self.selected_folder:
-            file_name = os.path.basename(self.selected_folder)  
-            restore_path = os.path.expanduser("~/Desktop")  
+            file_name = os.path.basename(self.selected_folder)
+            restore_path = os.path.expanduser("~/Downloads/Restore")
             restored_file = restore_backup(file_name, restore_path)
 
             if restored_file:
@@ -63,9 +67,6 @@ class MainWindow(QMainWindow):
         else:
             self.log.append("❌ Ошибка: выберите файл для восстановления")
 
-
-
     def open_settings(self):
-        from ui.settings_window import SettingsWindow
         self.settings_window = SettingsWindow()
         self.settings_window.show()

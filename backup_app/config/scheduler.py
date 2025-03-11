@@ -3,6 +3,7 @@ import platform
 import subprocess
 from config.settings import load_settings
 
+
 def schedule_backup():
     """Запускает бэкап по расписанию в зависимости от ОС."""
     settings = load_settings()
@@ -17,6 +18,7 @@ def schedule_backup():
         setup_task_scheduler(interval, script_path)
     else:
         print("Операционная система не поддерживается.")
+
 
 def setup_launchd(interval, script_path):
     """Настраивает запуск через launchd (macOS)."""
@@ -44,23 +46,26 @@ def setup_launchd(interval, script_path):
         file.write(plist_content)
 
     subprocess.run(["launchctl", "load", plist_path])
-    print(f"Бэкап запланирован каждые {interval//3600} часов (macOS).")
+    print(f"Бэкап запланирован каждые {interval // 3600} часов (macOS).")
+
 
 def setup_cron(interval, script_path):
     """Настраивает cron-задачу для Linux."""
     cron_command = f"python3 {script_path}"
-    cron_entry = f"0 */{interval//3600} * * * {cron_command}"
+    cron_entry = f"0 */{interval // 3600} * * * {cron_command}"
 
     subprocess.run("(crontab -l; echo '{}') | crontab -".format(cron_entry), shell=True)
-    print(f"Бэкап запланирован каждые {interval//3600} часов (Linux).")
+    print(f"Бэкап запланирован каждые {interval // 3600} часов (Linux).")
+
 
 def setup_task_scheduler(interval, script_path):
     """Настраивает Windows Task Scheduler."""
     task_name = "BackupTask"
-    command = f'schtasks /create /tn "{task_name}" /tr "python {script_path}" /sc HOURLY /mo {interval//3600} /f'
+    command = f'schtasks /create /tn "{task_name}" /tr "python {script_path}" /sc HOURLY /mo {interval // 3600} /f'
 
     subprocess.run(command, shell=True)
-    print(f"Бэкап запланирован каждые {interval//3600} часов (Windows).")
+    print(f"Бэкап запланирован каждые {interval // 3600} часов (Windows).")
+
 
 if __name__ == "__main__":
     schedule_backup()

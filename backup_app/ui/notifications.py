@@ -5,6 +5,7 @@ if platform.system() == "Darwin":
 elif platform.system() == "Windows":
     from plyer import notification
 
+
 def send_notification(title, message):
     """Отправляет системное уведомление"""
     if platform.system() == "Darwin":

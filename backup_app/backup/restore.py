@@ -1,9 +1,10 @@
 import os
 import shutil
-from logs.logger import log_info, log_error
-from ui.notifications import send_notification
+from backup_app.logs.logger import log_info, log_error
+from backup_app.ui.notifications import send_notification
 
 BACKUP_DIR = "backups/"
+
 
 def find_latest_backup(file_name):
     """Ищет последнюю версию файла в папке backups/."""
@@ -22,6 +23,7 @@ def find_latest_backup(file_name):
 
     log_error(f"❌ Файл {file_name} не найден в папке backups/!")
     return None  # Если файл не найден
+
 
 def restore_backup(file_name, restore_path):
     """Восстанавливает файл из последнего бэкапа."""

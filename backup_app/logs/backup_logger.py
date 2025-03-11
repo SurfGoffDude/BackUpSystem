@@ -13,13 +13,16 @@ logging.basicConfig(
     handlers=[logging.FileHandler(BACKUP_LOG_FILE, encoding="utf-8")]
 )
 
+
 def log_backup_success(backup_file, size_mb, duration):
     """Логирует успешное создание бэкапа"""
     logging.info(f"✅ Бэкап {backup_file} ({size_mb:.2f} MB) создан за {duration:.2f} сек.")
 
+
 def log_backup_error(backup_file, error_message):
     """Логирует ошибку при создании бэкапа"""
     logging.error(f"❌ Ошибка при создании {backup_file}: {error_message}")
+
 
 if __name__ == "__main__":
     log_backup_success("backup_2024-03-10.tar.gz", 250.5, 10.2)
