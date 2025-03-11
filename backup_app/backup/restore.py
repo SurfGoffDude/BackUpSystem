@@ -66,13 +66,13 @@ def restore_backup(file_name, restore_base_path):
     modified_time = os.path.getmtime(backup_file)
     formatted_date = datetime.fromtimestamp(modified_time).strftime("%Y-%m-%d_%H-%M-%S")
 
-    # ✅ Проверяем, нет ли уже имени файла в пути
+    # ✅ Проверяем, нет ли уже `file_name` в `restore_base_path`
     if os.path.basename(restore_base_path) == file_name:
         final_restore_path = os.path.join(restore_base_path, formatted_date)
     else:
-        final_restore_path = os.path.join(restore_base_path, file_name, formatted_date)
+        final_restore_path = os.path.join(restore_base_path, formatted_date)
 
-    # ✅ Проверяем, не является ли `final_restore_path` файлом
+        # ✅ Проверяем, не является ли `final_restore_path` файлом
     if os.path.exists(final_restore_path) and not os.path.isdir(final_restore_path):
         log_error(f"❌ Ошибка: {final_restore_path} уже существует и это не папка!")
         return False
