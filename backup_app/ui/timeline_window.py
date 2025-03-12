@@ -3,9 +3,9 @@ from PyQt6.QtChart import QChart, QChartView, QLineSeries
 from PyQt6.QtCore import Qt, QPointF
 import os
 from datetime import datetime
-from backup.restore import restore_file
+from backup_app.backup.restore import restore_backup
 
-BACKUP_DIR = "backups/"
+BACKUP_DIR = os.path.expanduser("~/Downloads/backups/")
 
 
 class TimelineWindow(QDialog):
