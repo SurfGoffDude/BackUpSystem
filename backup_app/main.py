@@ -18,6 +18,18 @@ def setup_app():
     return settings
 
 
+def resource_path(relative_path):
+    """Получение корректного пути к файлам внутри .app"""
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+sys.path.append(resource_path("backup_app"))
+
 if __name__ == "__main__":
     settings = setup_app()
 
