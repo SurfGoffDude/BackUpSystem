@@ -3,16 +3,11 @@ import os
 
 
 def resource_path(relative_path):
-    """Получение корректного пути к файлам внутри .app"""
-    if getattr(sys, 'frozen', False):  # Если запущено как PyInstaller .app
+    """ Получаем путь к ресурсам внутри исполняемого файла """
+    if getattr(sys, '_MEIPASS', False):  # Проверяем, существует ли _MEIPASS
         base_path = sys._MEIPASS
     else:
-        base_path = os.path.abspath(".")
-
-    # 🔥 Учитываем macOS App Bundle (Contents/MacOS)
-    if sys.platform == "darwin" and "Backup Manager.app" in base_path:
-        base_path = os.path.join(base_path, "..", "..")
-
+        base_path = os.path.abspath(os.path.dirname(__file__))  # ✅ cx_Freeze-friendly путь
     return os.path.join(base_path, relative_path)
 
 
